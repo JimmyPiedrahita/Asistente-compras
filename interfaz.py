@@ -1,9 +1,14 @@
 import tkinter as tk
 from tkinter import messagebox
-from listas import ListaDoblementeEnlazada
+from listas import ListaDoblementeEnlazada, ListaSimple
 
 # Instancia global de la lista doblemente enlazada para las compras del usuario
 lista_compras = ListaDoblementeEnlazada()
+
+# Instancias de listas simples para los almacenes
+almacen_1 = ListaSimple()
+almacen_2 = ListaSimple()
+almacen_3 = ListaSimple()
 
 def show_user_menu(root):
     for widget in root.winfo_children():
@@ -90,30 +95,74 @@ def show_admin_menu(root):
     frame_add.pack(pady=10)
     
     tk.Label(frame_add, text="Nombre:").grid(row=0, column=0, padx=5)
-    tk.Entry(frame_add).grid(row=0, column=1, padx=5)
+    entry_nombre = tk.Entry(frame_add)
+    entry_nombre.grid(row=0, column=1, padx=5)
     
     tk.Label(frame_add, text="Precio:").grid(row=0, column=2, padx=5)
-    tk.Entry(frame_add).grid(row=0, column=3, padx=5)
+    entry_precio = tk.Entry(frame_add)
+    entry_precio.grid(row=0, column=3, padx=5)
     
     tk.Label(frame_add, text="Almacen:").grid(row=0, column=4, padx=5)
     opciones = ["Almacen 1", "Almacen 2", "Almacen 3"]
     var_almacen = tk.StringVar(value=opciones[0])
     tk.OptionMenu(frame_add, var_almacen, *opciones).grid(row=0, column=5, padx=5)
     
-    tk.Button(frame_add, text="Agregar").grid(row=0, column=6, padx=5)
-    
     # Visualización de los 3 almacenes
     frame_lists = tk.Frame(root)
     frame_lists.pack(pady=10)
     
     tk.Label(frame_lists, text="Almacen 1").grid(row=0, column=0)
-    tk.Listbox(frame_lists, height=15, width=25).grid(row=1, column=0, padx=10)
+    listbox_a1 = tk.Listbox(frame_lists, height=15, width=25)
+    listbox_a1.grid(row=1, column=0, padx=10)
     
     tk.Label(frame_lists, text="Almacen 2").grid(row=0, column=1)
-    tk.Listbox(frame_lists, height=15, width=25).grid(row=1, column=1, padx=10)
+    listbox_a2 = tk.Listbox(frame_lists, height=15, width=25)
+    listbox_a2.grid(row=1, column=1, padx=10)
     
     tk.Label(frame_lists, text="Almacen 3").grid(row=0, column=2)
-    tk.Listbox(frame_lists, height=15, width=25).grid(row=1, column=2, padx=10)
+    listbox_a3 = tk.Listbox(frame_lists, height=15, width=25)
+    listbox_a3.grid(row=1, column=2, padx=10)
+    
+    def actualizar_almacenes():
+        listbox_a1.delete(0, tk.END)
+        for p in almacen_1.mostrar(): listbox_a1.insert(tk.END, f"{p['nombre']} - ${p['precio']:.2f}")
+        
+        listbox_a2.delete(0, tk.END)
+        for p in almacen_2.mostrar(): listbox_a2.insert(tk.END, f"{p['nombre']} - ${p['precio']:.2f}")
+        
+        listbox_a3.delete(0, tk.END)
+        for p in almacen_3.mostrar(): listbox_a3.insert(tk.END, f"{p['nombre']} - ${p['precio']:.2f}")
+
+    def agregar_producto_admin():
+        nombre = entry_nombre.get().strip()
+        precio_str = entry_precio.get().strip()
+        if not nombre or not precio_str:
+            messagebox.showwarning("Advertencia", "Ingrese nombre y precio")
+            return
+            
+        try:
+            precio = float(precio_str)
+        except ValueError:
+            messagebox.showerror("Error", "El precio debe ser un valor numérico")
+            return
+            
+        producto_obj = {"nombre": nombre, "precio": precio}
+        almacen_sel = var_almacen.get()
+        
+        if almacen_sel == "Almacen 1":
+            almacen_1.agregar(producto_obj)
+        elif almacen_sel == "Almacen 2":
+            almacen_2.agregar(producto_obj)
+        elif almacen_sel == "Almacen 3":
+            almacen_3.agregar(producto_obj)
+            
+        entry_nombre.delete(0, tk.END)
+        entry_precio.delete(0, tk.END)
+        actualizar_almacenes()
+
+    tk.Button(frame_add, text="Agregar", command=agregar_producto_admin).grid(row=0, column=6, padx=5)
+    
+    actualizar_almacenes()
     
     tk.Button(root, text="Volver", command=lambda: main_menu(root), width=20).pack(pady=10)
 

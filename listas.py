@@ -1,3 +1,31 @@
+class NodoSimple:
+    def __init__(self, dato):
+        self.dato = dato
+        self.siguiente = None
+
+class ListaSimple:
+    def __init__(self):
+        self.cabeza = None
+
+    def esta_vacia(self):
+        return self.cabeza is None
+
+    def agregar(self, dato):
+        nuevo_nodo = NodoSimple(dato)
+        if self.esta_vacia():
+            self.cabeza = nuevo_nodo
+        else:
+            actual = self.cabeza
+            while actual.siguiente:
+                actual = actual.siguiente
+            actual.siguiente = nuevo_nodo
+
+    def mostrar(self):
+        actual = self.cabeza
+        while actual:
+            yield actual.dato
+            actual = actual.siguiente
+
 class Nodo:
     def __init__(self, dato):
         self.dato = dato
