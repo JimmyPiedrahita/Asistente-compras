@@ -73,16 +73,66 @@ def show_user_menu(root):
     # Carga inicial de elementos si la lista de compras ya tiene contenido
     actualizar_lista()
 
+    def buscar_mejor_precio():
+        res_a1 = ListaSimple()
+        res_a2 = ListaSimple()
+        res_a3 = ListaSimple()
+
+        for producto in lista_compras.mostrar():
+            p_lower = producto.lower()
+            mejor_almacen = None
+            mejor_precio = float('inf')
+
+            for p1 in almacen_1.mostrar():
+                if p1["nombre"].lower() == p_lower and p1["precio"] < mejor_precio:
+                    mejor_precio = p1["precio"]
+                    mejor_almacen = 1
+
+            for p2 in almacen_2.mostrar():
+                if p2["nombre"].lower() == p_lower and p2["precio"] < mejor_precio:
+                    mejor_precio = p2["precio"]
+                    mejor_almacen = 2
+
+            for p3 in almacen_3.mostrar():
+                if p3["nombre"].lower() == p_lower and p3["precio"] < mejor_precio:
+                    mejor_precio = p3["precio"]
+                    mejor_almacen = 3
+
+            if mejor_almacen == 1:
+                res_a1.agregar({"nombre": producto, "precio": mejor_precio})
+            elif mejor_almacen == 2:
+                res_a2.agregar({"nombre": producto, "precio": mejor_precio})
+            elif mejor_almacen == 3:
+                res_a3.agregar({"nombre": producto, "precio": mejor_precio})
+
+        listbox_resultados.delete(0, tk.END)
+
+        if not res_a1.esta_vacia():
+            listbox_resultados.insert(tk.END, "--- Almacén 1 ---")
+            for p in res_a1.mostrar():
+                listbox_resultados.insert(tk.END, f"  {p['nombre']} - ${p['precio']:.2f}")
+        
+        if not res_a2.esta_vacia():
+            listbox_resultados.insert(tk.END, "--- Almacén 2 ---")
+            for p in res_a2.mostrar():
+                listbox_resultados.insert(tk.END, f"  {p['nombre']} - ${p['precio']:.2f}")
+
+        if not res_a3.esta_vacia():
+            listbox_resultados.insert(tk.END, "--- Almacén 3 ---")
+            for p in res_a3.mostrar():
+                listbox_resultados.insert(tk.END, f"  {p['nombre']} - ${p['precio']:.2f}")
+
     # Controles para buscar
     frame_search = tk.Frame(root)
-    
-    frame_search.pack(pady=5)
-    tk.Button(frame_search, text="Buscar en almacenes").grid(row=0, column=2, padx=5)
-    
-    tk.Label(root, text="Resultados de Búsqueda:").pack()
-    tk.Listbox(root, width=60, height=4).pack(pady=5)
 
-    tk.Button(root, text="Volver", command=lambda: main_menu(root), width=20).pack(pady=10)
+    frame_search.pack(pady=5)
+    tk.Button(frame_search, text="Buscar en almacenes", command=buscar_mejor_precio).grid(row=0, column=2, padx=5)
+
+    tk.Label(root, text="Resultados de Búsqueda:").pack()
+    listbox_resultados = tk.Listbox(root, width=60, height=10)
+    listbox_resultados.pack(pady=5)
+
+    tk.Button(root, text="Volver", command=lambda: main_menu(root), width=25).pack(pady=10)
 
 def show_admin_menu(root):
     for widget in root.winfo_children():
